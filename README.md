@@ -83,7 +83,7 @@ Add this to your `claude_desktop_config.json`:
   "mcpServers": {
     "github-ranker": {
       "type": "streamable-http",
-      "url": "http://localhost:8000/mcp"
+      "url": "https://github-mcp-server-opoq.onrender.com/mcp"
     }
   }
 }
@@ -92,10 +92,6 @@ Add this to your `claude_desktop_config.json`:
 `claude_desktop_config.json` is located at:
 - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 - **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
-
-Once deployed remotely, replace `http://localhost:8000/mcp` with your deployed server URL.
-
-Restart Claude Desktop after editing the config.
 
 ## Deploying
 
