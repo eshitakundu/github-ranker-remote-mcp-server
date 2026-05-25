@@ -25,12 +25,18 @@ async def _fetch_github(client: httpx.AsyncClient, username: str) -> dict | None
             params={"per_page": 100, "sort": "updated"},
         ),
     )
+
     if profile_r.status_code == 404:
         return None
     if profile_r.status_code == 429:
         return {"error": "rate_limited", "username": username}
+    if profile_r.status_code != 200:
+        return {"error": f"github_api_{profile_r.status_code}", "username": username}
 
-    p     = profile_r.json()
+    p = profile_r.json()
+    if "login" not in p:
+        return {"error": "unexpected_response", "username": username}
+
     repos = repos_r.json() if repos_r.status_code == 200 else []
 
     lang_counts: dict[str, int] = {}
@@ -92,10 +98,16 @@ async def rank_candidates(usernames: list[str], job_title: str, skills: str) -> 
     skill_list = [s.strip() for s in skills.split(",")]
     valid      = [r for r in results if r and "error" not in r]
     not_found  = [u for u, r in zip(usernames, results) if r is None]
-    rate_lim   = [r["username"] for r in results if r and "error" in r]
+    rate_lim   = [r["username"] for r in results if r and r.get("error") == "rate_limited"]
+    api_errors = [r["username"] for r in results if r and "error" in r and r.get("error") != "rate_limited"]
 
     if not valid:
-        return json.dumps({"error": "No valid profiles fetched.", "not_found": not_found})
+        return json.dumps({
+            "error":       "No valid profiles fetched.",
+            "not_found":   not_found,
+            "rate_limited": rate_lim,
+            "api_errors":  api_errors,
+        })
 
     scored = sorted(
         [(*_score(c, skill_list), c) for c in valid],
@@ -104,10 +116,11 @@ async def rank_candidates(usernames: list[str], job_title: str, skills: str) -> 
     )
 
     return json.dumps({
-        "job_title":   job_title,
-        "skills":      skills,
-        "not_found":   not_found,
+        "job_title":    job_title,
+        "skills":       skills,
+        "not_found":    not_found,
         "rate_limited": rate_lim,
+        "api_errors":   api_errors,
         "ranking": [
             {
                 "rank":          i + 1,
@@ -146,6 +159,7 @@ Candidate data:
 {candidate_data}
 
 Output only the markdown report. No preamble."""
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
