@@ -18,7 +18,7 @@ Give it a list of GitHub usernames, a job title, and required skills — it fetc
 Go to Claude.ai → Settings → Customize → Add MCP Server → paste:
 
 ```
-https://github-ranker-remote-mcp-server.onrender.com
+https://github-ranker-remote-mcp-server.onrender.com/mcp
 ```
 
 > **Note:** Hosted on Render's free tier — first request after 15 min idle takes ~30s to wake up.
