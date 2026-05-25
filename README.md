@@ -6,6 +6,10 @@ A remote MCP server built with FastMCP that ranks GitHub candidates against a jo
 
 Give it a list of GitHub usernames, a job title, and required skills — it fetches each profile from the GitHub API, scores them by skill match (languages + repo topics), and returns ranked candidate data. A prompt primitive is included for the MCP client's LLM to format the output as a markdown report.
 
+## Demo
+
+![Demo](assets/demo.gif)
+
 ## Primitives
 
 | Primitive | Name | Description |
