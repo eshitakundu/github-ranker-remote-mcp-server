@@ -3,6 +3,7 @@ import asyncio
 import json
 import httpx
 from fastmcp import FastMCP
+from mcp.types import ToolAnnotations
 
 mcp = FastMCP("github-ranker")
 
@@ -80,7 +81,9 @@ def _score(candidate: dict, skills: list[str]) -> tuple[int, list[str]]:
     return len(matched), [s.strip() for s in skills if s.strip().lower() in matched]
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(
+    readOnlyHint=True, destructiveHint=False, idempotentHint=True, openWorldHint=True,
+))
 async def rank_candidates(usernames: list[str], job_title: str, skills: str) -> str:
     """
     Fetch GitHub profiles for the given usernames and score each against
